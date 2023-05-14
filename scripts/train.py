@@ -35,10 +35,12 @@ train_ds = VisuotactileDataset()
 train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, shuffle=True,  num_workers=4)
 
 # Create the optimizer
-optimizer = torch.optim.SGD(tactile_model.parameters(), args.lr,
-                            momentum=args.momentum,
-                            weight_decay=args.weight_decay)
+#optimizer = torch.optim.SGD(tactile_model.parameters(), args.lr,
+#                            momentum=args.momentum,
+#                            weight_decay=args.weight_decay)
 
+optimizer = torch.optim.AdamW(tactile_model.parameters(), args.lr,
+                            weight_decay=args.weight_decay)
 # Define the loss function
 criterion = torch.nn.CrossEntropyLoss().to(device)
 
