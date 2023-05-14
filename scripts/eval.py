@@ -21,9 +21,9 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('device: ', device)
 
 # Load checkpoint
-tactile_model = torch.load(os.environ['HOME'] + '/src/visuotactile_transformer/models/checkpoints/save/tactile_model_0300.bin',map_location='cpu')
+tactile_model = torch.load(os.environ['HOME'] + '/src/visuotactile_transformer/models/checkpoints/tactile_model_0050.bin',map_location='cpu')
 tactile_model.eval()
-vision_model = torch.load(os.environ['HOME'] + '/src/visuotactile_transformer/models/checkpoints/save/vision_model_0300.bin',map_location='cpu')
+vision_model = torch.load(os.environ['HOME'] + '/src/visuotactile_transformer/models/checkpoints/vision_model_0050.bin',map_location='cpu')
 vision_model.eval()
 feature_extractor = ViTFeatureExtractor.from_pretrained(os.environ['HOME'] + "/src/visuotactile_transformer/models")
 
@@ -32,7 +32,20 @@ if torch.cuda.is_available():
     tactile_model.cuda()
 
 # Evaluate on training data
-list_shapes = glob.glob(os.environ['HOME'] + '/src/visuotactile_transformer/data/pin_big_subset/local_shape*.png')
+data_path = os.environ['HOME'] + '/src/visuotactile_transformer/data/'
+data_folders = ['pin_big_subset/', 'aux_big/', 'stud_big/', 'usb_big/']
+list_shapes = []
+classes = []
+for i,df in enumerate(data_folders):
+    list_shapes.extend(glob.glob(data_path + df + 'local_shape*1.png'))
+    classes.append(i)
+
+import random
+c = list(zip(list_shapes, classes))
+random.shuffle(c)
+list_shapes, classes = zip(*c)
+
+#list_shapes = np.random.permutation(list_shapes)
 
 transforms = Compose([
           Grayscale(num_output_channels=3),
@@ -61,7 +74,7 @@ def process_img(path, transforms, feature_extractor, model, device, vision=False
 
 all_tactile = []
 all_vision = []
-for i, ls in enumerate(list_shapes):
+for i, ls in enumerate(list_shapes[:100]):
     print('iteration ', i)
     tactile = process_img(ls, transforms, feature_extractor, tactile_model, device)
     vision = process_img(ls.replace('local_shape','depth').replace('png','npy'), transforms, feature_extractor, vision_model, device, vision=True)
@@ -74,7 +87,7 @@ tsne_vision = TSNE(n_components=3).fit_transform(torch.cat(all_vision,dim=0).cpu
 
 import matplotlib.pyplot as plt
 ax = plt.figure(figsize=(16,10)).gca(projection='3d')
-ax.scatter(tsne_tactile[:,0],tsne_tactile[:,1], tsne_tactile[:,2])
-ax.scatter(tsne_vision[:,0],tsne_vision[:,1], tsne_vision[:,2])
-plt.show()
+ax.scatter(tsne_tactile[:,0],tsne_tactile[:,1], tsne_tactile[:,2], c=classes[:100],cmap='tab10')
+ax.scatter(tsne_vision[:,0],tsne_vision[:,1], tsne_vision[:,2], c=classes[:100], cmap='tab10')
+plt.savefig('test')
 import pdb; pdb.set_trace()

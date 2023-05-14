@@ -10,6 +10,7 @@ import sys
 import importlib
 import time
 import datetime
+import os
 from torch.autograd import Variable
 
 from torchvision.transforms import Compose, Resize, ToTensor, Grayscale
@@ -28,9 +29,9 @@ def main():
 
     # Initialize vision and tactile transformers
     print('initializing pretrained...')
-    feature_extractor = ViTFeatureExtractor.from_pretrained("/home/gridsan/bronars/src/visuotactile_transformer/models") #'google/vit-base-patch16-224-in21k')
-    vision_model = ViTModel.from_pretrained("/home/gridsan/bronars/src/visuotactile_transformer/models") #('google/vit-base-patch16-224-in21k')
-    tactile_model = ViTModel.from_pretrained("/home/gridsan/bronars/src/visuotactile_transformer/models") #('google/vit-base-patch16-224-in21k')
+    feature_extractor = ViTFeatureExtractor.from_pretrained(os.environ['HOME'] + "/src/visuotactile_transformer/models") #'google/vit-base-patch16-224-in21k')
+    vision_model = ViTModel.from_pretrained(os.environ['HOME'] + "/src/visuotactile_transformer/models") #('google/vit-base-patch16-224-in21k')
+    tactile_model = ViTModel.from_pretrained(os.environ['HOME'] + "/src/visuotactile_transformer/models") #('google/vit-base-patch16-224-in21k')
     print('initializing pretrained is complete!')
 
     if torch.cuda.is_available():
