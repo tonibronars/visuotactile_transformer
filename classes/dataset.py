@@ -12,7 +12,7 @@ class VisuotactileDataset(torch.utils.data.Dataset):
         multiple captions for each image, the image_filenames must have repetitive
         file names 
         """
-        self.data_path = 'data/pin_big_subset/'
+        self.data_path = 'visuotactile_transformer/data/pin_big_subset/'
         self.img_filenames = sorted(glob.glob(self.data_path + 'local_shape_*_1.png'))
         self.transforms = Compose([
           Grayscale(num_output_channels=3),
