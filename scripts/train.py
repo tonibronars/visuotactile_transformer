@@ -22,10 +22,17 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def save_checkpoint(state, filename):
     torch.save(state, filename)
 
+
+saving_folder = 'transformer_3'
+
+save_path = '/home/gridsan/bronars/src/visuotactile_transformer/models/{}/'.format(saving_folder)
+os.makedirs(save_path,exist_ok=True)
+
 # Define training parameters
 def main():
+    lowest_loss = 1000000
     from argparse import Namespace
-    args = Namespace(input_pose=True, is_binary=False, is_vision=False, batch_size=16,  lr=0.00001, momentum=0.9, weight_decay=0)
+    args = Namespace(input_pose=True, is_binary=False, is_vision=False, batch_size=64,  lr=0.00001, momentum=0.9, weight_decay=0)
 
     # Initialize vision and tactile transformers
     print('initializing pretrained...')
@@ -43,18 +50,16 @@ def main():
     train_loader = torch.utils.data.DataLoader(train_ds, batch_size=args.batch_size, shuffle=True,  num_workers=4)
 
     # Create the optimizer
-    #optimizer = torch.optim.SGD(tactile_model.parameters(), args.lr,
-    #                            momentum=args.momentum,
-    #                            weight_decay=args.weight_decay)
-
     params = [{"params": vision_model.parameters(), "lr": args.lr},
                 {"params": tactile_model.parameters(), "lr": args.lr}]
     optimizer = torch.optim.AdamW(params, args.lr,
                                 weight_decay=args.weight_decay)
+    scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer,gamma=0.9)
+
     # Define the loss function
     criterion = torch.nn.CrossEntropyLoss().to(device)
 
-    for epoch in range(10001):        
+    for epoch in range(51):        
       for step, item in enumerate(train_loader):
         # Change input array into list with each batch being one element
         tactile = item['tactile']
@@ -91,10 +96,15 @@ def main():
 
         if step % 5 == 0:
           print('Epoch: ', epoch, '| train loss: ', loss)
-      if epoch % 10 == 0:
-        save_checkpoint(tactile_model,'/home/gridsan/bronars/src/visuotactile_transformer/models/checkpoints/tactile_model_{:04d}.bin'.format(epoch))
-        save_checkpoint(vision_model,'/home/gridsan/bronars/src/visuotactile_transformer/models/checkpoints/vision_model_{:04d}.bin'.format(epoch))
 
+      scheduler.step()
+      if loss.item() < lowest_loss:
+        save_checkpoint(vision_model, save_path + 'vision_model_best.bin')
+        save_checkpoint(tactile_model, save_path + 'tactile_model_best.bin')
+        lowest_loss = loss.item()
+      if epoch % 10 == 0:
+        save_checkpoint(vision_model, save_path + 'vision_model_{:04d}.bin'.format(epoch))
+        save_checkpoint(tactile_model, save_path + 'tactile_model_{:04d}.bin'.format(epoch))
 if __name__ == '__main__':
     print('train module is being executed')
     main()
