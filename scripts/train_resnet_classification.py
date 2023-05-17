@@ -18,8 +18,8 @@ from torchvision.transforms import Compose, Resize, ToTensor, Grayscale
 from visuotactile_transformer.classes.dataset_classification import VisuotactileDataset
 
 vision_only = False
-tactile_only = True 
-saving_folder = 'tactile_resnet_classification_ang'
+tactile_only = False
+saving_folder = 'visuotactile_resnet_classification_erase_big'
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') 
 save_path = '/home/gridsan/bronars/src/visuotactile_transformer/models/{}/'.format(saving_folder)

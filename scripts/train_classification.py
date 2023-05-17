@@ -24,7 +24,7 @@ def save_checkpoint(state, filename):
 
 tactile_only = False
 vision_only = True
-saving_folder = 'vision_transformer_classification_ang'
+saving_folder = 'vision_transformer_classification_erase_big2'
 
 
 save_path = '/home/gridsan/bronars/src/visuotactile_transformer/models/{}/'.format(saving_folder)

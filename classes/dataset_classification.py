@@ -86,9 +86,9 @@ class VisuotactileDataset(torch.utils.data.Dataset):
             #CenterCrop((random_crop_size, random_crop_size)),
             Resize((224, 224)),
             ToTensor(),
-            Normalize(),
             #Grayscale(num_output_channels=3),
-            #RandomErasing(scale=(0.03, 0.08), value=np.random.rand()*0.05 + 0.6),
+            Normalize(),
+            RandomErasing(scale=(0.3, 0.3), value=np.random.rand()*0.05 + 0.6, p=1),
             #AddGaussianNoise(0., 0.01)
         ])
 
