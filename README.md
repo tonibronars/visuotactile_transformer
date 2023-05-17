@@ -3,7 +3,7 @@ Visuotactile transformers is our final project (me and @nehasunil) for Computer 
 
 ## Datasets
 
-We generate collocated visual (depth images) and tactile (contact images) in simulation for four objects, and release our datasets here. The datasets we used for training are under: 
+We generate collocated visual (depth images) and tactile (contact images) in simulation for four objects, and release our datasets here. To access the datasets, unzip the `training_data.zip` and `validation_data.zip` files. Then, theS datasets we used for training are under: 
  
 `data/{pin_big_subset,aux_big,stud_big,usb_big}_ang/`
 
